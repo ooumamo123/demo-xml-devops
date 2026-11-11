@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ETAPE 1 : build ANT (impératif : on décrit chaque étape) -->
+<project name="calculatrice" default="test" basedir=".">
+
+    <property name="src.dir"   value="src/main/java"/>
+    <property name="test.dir"  value="src/test/java"/>
+    <property name="build.dir" value="build-ant"/>
+    <property name="junit.jar" value="lib/junit-platform-console-standalone-1.10.2.jar"/>
+
+    <target name="clean" description="Supprime les fichiers générés">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" description="Compile le code principal">
+        <mkdir dir="${build.dir}/classes"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}/classes"
+               includeantruntime="false" release="21"/>
+    </target>
+
+    <target name="compile-tests" depends="compile" description="Compile les tests">
+        <mkdir dir="${build.dir}/test-classes"/>
+        <javac srcdir="${test.dir}" destdir="${build.dir}/test-classes"
+               includeantruntime="false" release="21">
+            <classpath>
+                <pathelement location="${build.dir}/classes"/>
+                <pathelement location="${junit.jar}"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile-tests" description="Lance les tests JUnit">
+        <java jar="${junit.jar}" fork="true" failonerror="true">
+            <arg value="--class-path"/>
+            <arg path="${build.dir}/classes:${build.dir}/test-classes"/>
+            <arg value="--scan-class-path"/>
+        </java>
+    </target>
+
+    <target name="jar" depends="test" description="Crée le JAR">
+        <jar destfile="${build.dir}/calculatrice.jar" basedir="${build.dir}/classes">
+            <manifest>
+                <attribute name="Main-Class" value="com.exemple.Main"/>
+            </manifest>
+        </jar>
+    </target>
+</project>

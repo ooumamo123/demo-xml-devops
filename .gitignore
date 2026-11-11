@@ -1,0 +1,3 @@
+target/
+build-ant/
+lib/*.jar
